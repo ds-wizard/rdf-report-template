@@ -5,4 +5,16 @@ This is a template for Data Stewardship Wizard directly transforms a questionnai
 *  **knowledge-model** part transforms every element of used knowledge model
 *  **questionnaire-replies** part transfroms information regarding the questionnaire, its replies and questionnaire versions.
 
+## Issues and Contributing
 
+This document template for DSW is available as open-source via GitHub Repository [ds-wizard/science-europe-template](https://github.com/ds-wizard/rdf-report-template), you can [report issues](https://github.com/ds-wizard/rdf-report-template/issues) there and fork it for customisations or contributions.
+
+## License
+
+This template is released under Apache Licence, version 2. Read the LICENSE file for details.
+
+## Changelog
+
+### 0.1.0
+
+- Initial version of RDF Report template
