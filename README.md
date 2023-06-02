@@ -7,7 +7,7 @@ This is a template for Data Stewardship Wizard directly transforms a questionnai
 
 ## Issues and Contributing
 
-This document template for DSW is available as open-source via GitHub Repository [ds-wizard/science-europe-template](https://github.com/ds-wizard/rdf-report-template), you can [report issues](https://github.com/ds-wizard/rdf-report-template/issues) there and fork it for customisations or contributions.
+This document template for DSW is available as open-source via GitHub Repository [ds-wizard/rdf-report-template](https://github.com/ds-wizard/rdf-report-template), you can [report issues](https://github.com/ds-wizard/rdf-report-template/issues) there and fork it for customisations or contributions.
 
 ## License
 
