@@ -1,0 +1,184 @@
+{#- ------------------------------------------------------------------------------------ -#}
+{#-  GENERAL MACROS                                                                      -#}
+{#- ------------------------------------------------------------------------------------ -#}
+
+{%- macro renderList(list, strBefore, strAfter) -%}
+  {%- set resultList = [] -%}
+    {%- for item in list -%}
+    {%- do resultList.append(strBefore+item+strAfter) -%}
+    {%- endfor -%}
+    {{resultList|join(", ") }}
+{%- endmacro -%}
+
+{#- ------------------------------------------------------------------------------------ -#}
+{#- CHAPTER REPORT MACRO                                                                 -#}
+{#- ------------------------------------------------------------------------------------ -#}
+
+{%- macro renderChapterReport(chapterReport, index) -%}
+report:chapterReport-{{chapterReport.chapterUuid}} a dsw:ChapterReportItem ;
+  dsw:reportItemId "chapterReport-{{chapterReport.chapterUuid}}" ;
+  dsw:isAboutChapter km:{{chapterReport.chapterUuid}} ;
+  {%- if chapterReport.metrics %}
+  dsw:hasResult
+  {%- for metric in chapterReport.metrics %}
+    [ a dsw:ReportMetric ;
+      dsw:resultMeasure "{{metric.measure}}"^^xsd:float ;
+      dsw:hasMetric km:{{metric.metric}} ]
+      {%- if not loop.last -%} ,
+      {%- elif chapterReport.indications -%} ;
+      {%- else -%} .
+      {%- endif -%}
+  {%- endfor -%}
+  {%- endif -%}
+
+{%- if chapterReport.indications %}
+  dsw:hasIndication
+  {%- for indication in chapterReport.indications %}
+    [ a dsw:ReportIndication ;
+      dsw:indicationType "{{indication.indicationType}}" ;
+      dsw:answered "{{indication.answeredQuestions}}"^^xsd:integer ;
+      dsw:unanswered "{{indication.unansweredQuestions}}"^^xsd:integer ]
+      {%- if not loop.last -%} ,
+      {%- else -%} .
+      {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+{%- endmacro -%}
+
+{#- ------------------------------------------------------------------------------------ -#}
+{#-  DOCUMENT                                                                            -#}
+{#- ------------------------------------------------------------------------------------  #}
+
+document:{{ctx.uuid}} a dsw:Document ;
+  dsw:uuid "{{ctx.uuid}}" ;
+  dsw:createdAt "{{ctx.createdAt}}"^^xsd:dateTime ;
+  dsw:updatedAt "{{ctx.updatedAt}}"^^xsd:dateTime ;
+  dsw:hasKnowledgeModel km:{{ctx.knowledgeModel.uuid}} ;
+  dsw:hasOrganization organization:{{ctx.organization.organizationId}} ;
+  dsw:hasContextConfig ctxConfig:contextConfig ;
+  dsw:hasQuestionnaire questionnaire:{{ctx.questionnaireUuid}} ;
+  dsw:hasReport report:{{ctx.report.uuid}} .
+
+{#- ------------------------------------------------------------------------------------ -#}
+{#-  ORGANIZATION                                                                        -#}
+{#- ------------------------------------------------------------------------------------ #}
+
+organization:{{ctx.organization.organizationId}} a dsw:Organization ;
+  dsw:organizationId "{{ctx.organization.organizationId}}" ;
+  dsw:title {{ctx.organization.name|tojson}} ;
+  dsw:description {{ctx.organization.description|tojson}} 
+  {%- set affiliations = renderList(ctx.organization.affiliations, '"', '"') -%}
+  {%- if affiliations|length > 0 %} ;
+  dsw:affiliation {{ affiliations.split(',')|join(", ")}}
+  {%- endif -%} .
+  
+{#- ------------------------------------------------------------------------------------ -#}
+{#-  CONTEXT CONFIG                                                                      -#}
+{#- ------------------------------------------------------------------------------------ #}
+
+ctxConfig:contextConfig a dsw:ContextConfig ;
+  dsw:clientUrl "{{ctx.config.clientUrl}}"^^schema:URL ;
+  dsw:documentTemplateMetamodelVersion "{{ctx.documentTemplateMetamodelVersion}}"^^xsd:integer .
+{#- ------------------------------------------------------------------------------------ -#}
+{#-  REPORT                                                                              -#}
+{#- ------------------------------------------------------------------------------------ #}
+
+report:{{ctx.report.uuid}} a dsw:Report ;
+  dsw:uuid "{{ctx.report.uuid}}" ;
+  dsw:hasTotalReport report:totalReport ;
+
+  {%- if ctx.report.chapterReports|length > 0 -%}
+  {%- set chapterReports = [] -%}
+  {%- for chapterReport in ctx.report.chapterReports -%}
+  {%- do chapterReports.append("report:chapterReport-"+chapterReport.chapterUuid) -%}
+  {%- endfor %}
+  dsw:hasChapterReport {{chapterReports|join(", ")}} ;
+  {%- endif %}
+  dsw:createdAt "{{ctx.report.createdAt}}"^^xsd:dateTime ;
+  dsw:updatedAt "{{ctx.report.updatedAt}}"^^xsd:dateTime .
+
+{#- ------------------------------------------------------------------------------------ -#}
+{#-  TOTAL REPORT                                                                        -#}
+{#- ------------------------------------------------------------------------------------ #}
+
+report:totalReport a dsw:TotalReportItem ;
+  dsw:reportItemId "totalReport" ;
+{%- if ctx.report.totalReport.metrics  %}
+  dsw:hasResult
+  {%- for metric in ctx.report.totalReport.metrics %}
+    [ a dsw:ReportMetric ;
+      dsw:resultMeasure "{{metric.measure}}"^^xsd:float ;
+      dsw:hasMetric km:{{metric.metric}} ] 
+      {%- if not loop.last -%} ,
+      {%- elif ctx.report.totalReport.indications -%} ;
+      {%- else -%} .
+      {%- endif -%}
+  {% endfor -%}
+{%- endif -%}
+
+{%- if ctx.report.totalReport.indications %}
+  dsw:hasIndication
+  {%- for indication in ctx.report.totalReport.indications %}
+    [ a dsw:ReportIndication ;
+      dsw:indicationType "{{indication.indicationType}}" ;
+      dsw:answered "{{indication.answeredQuestions}}"^^xsd:integer ;
+      dsw:unanswered "{{indication.unansweredQuestions}}"^^xsd:integer ]
+      {%- if not loop.last -%} ,
+      {%- else -%} .
+      {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{#- ------------------------------------------------------------------------------------ -#}
+{#-  CHAPTER REPORT                                                                      -#}
+{#- ------------------------------------------------------------------------------------ #}
+
+{%- for chapterReport in ctx.report.chapterReports %}
+
+{{ renderChapterReport(chapterReport, loop.index) }}
+{% endfor %}
+
+{#- ------------------------------------------------------------------------------------ -#}
+{#-  USER                                                                                -#}
+{#- ------------------------------------------------------------------------------------ -#}
+
+{%- for simpleAuthorsItem in simpleAuthors -%}
+{%- if simpleAuthorsItem != ctx.createdBy.uuid -%}
+{%- set simpleAuthor = simpleAuthors[simpleAuthorsItem] -%}
+user:{{simpleAuthor.uuid}} a dsw:User;
+  dsw:uuid "{{simpleAuthor.uuid}}" ;
+  dsw:firstName {{simpleAuthor.firstName|tojson}} ;
+  dsw:lastName {{simpleAuthor.lastName|tojson}} ;
+  {%- if simpleAuthor.imageUrl %}
+  dsw:imageUrl "{{simpleAuthor.imageUrl}}"^^schema:URL ;
+  {%- endif -%}
+{%- endif -%}
+{%- endfor -%}
+
+{%- set user = ctx.createdBy %}
+
+user:{{user.uuid}} a dsw:User ;
+  dsw:uuid "{{user.uuid}}" ;
+  dsw:firstName {{user.firstName|tojson}} ;
+  dsw:lastName {{user.lastName|tojson}} ;
+  {%- if user.imageUrl %}
+  dsw:imageUrl "{{user.imageurl}}" ;
+  {%- endif %}
+  dsw:email {{user.email|tojson}};
+  dsw:role {{user.role|tojson}} ;
+  
+  {%- if user.affiliation %}
+  dsw:affiliation {{user.affiliation}} ;
+  {%- endif -%}
+
+  {%- set premissions = renderList(user.premissions, '"', '"') -%}
+  {%- if premissions|length > 0 %}
+  dsw:premission {{ premissions.split(',')|join(", ")}} .
+  {%- endif -%}
+  
+  {%- set sources = renderList(user.sources, '"', '"') -%}
+  {%- if sources|length > 0 %}
+  dsw:source {{ sources.split(',')|join(", ")}} ;
+  {%- endif %}
+  dsw:createdAt "{{user.createdAt}}"^^xsd:dateTime ;
+  dsw:updatedAt "{{user.updatedAt}}"^^xsd:dateTime .
