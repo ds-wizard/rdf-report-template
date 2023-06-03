@@ -1,0 +1,93 @@
+{
+    "templateId": "rdf-report",
+    "organizationId": "ontojana",
+    "version": "0.0.1",
+    "name": "RDF Report",
+    "description": "This template transforms a questionnaire into a RDF document.",
+    "license": "Apache-2.0",
+    "metamodelVersion": 11,
+    "allowedPackages": [
+        {
+            "orgId": null,
+            "kmId": null,
+            "minVersion": null,
+            "maxVersion": null
+        }
+    ],
+    "formats": [
+        {
+            "uuid": "0d535fe6-c966-4908-8af7-b284a9b36e34",
+            "name": "all RDF in TTL",
+            "icon": "fas fa-file",
+            "steps": [
+                {
+                    "name": "jinja",
+                    "options": {
+                        "template": "src/all.ttl.j2",
+                        "content-type": "text/ttl",
+                        "extension": "ttl"
+                    }
+                }
+            ]
+        },
+        {
+            "uuid": "bc842fc0-da0e-47b3-beff-f03e491d6c90",
+            "name": "knowledge-model RDF in TTL",
+            "icon": "fas fa-file",
+            "steps": [
+                {
+                    "name": "jinja",
+                    "options": {
+                        "template": "src/knowledge-model.ttl.j2",
+                        "content-type": "text/ttl",
+                        "extension": "ttl"
+                    }
+                }
+            ]
+        },
+        {
+            "uuid": "f14e3cff-77f7-481d-8b5c-551799aaf1a9",
+            "name": "questionnaire-replies RDF in TTL",
+            "icon": "fas fa-file",
+            "steps": [
+                {
+                    "name": "jinja",
+                    "options": {
+                        "template": "src/questionnaire-replies.ttl.j2",
+                        "content-type": "text/ttl",
+                        "extension": "ttl"
+                    }
+                }
+            ]
+        },
+        {
+            "uuid": "eadd6322-b732-4f56-a3e9-de2cf62c1f51",
+            "name": "context RDF in TTL",
+            "icon": "fas fa-file",
+            "steps": [
+                {
+                    "name": "jinja",
+                    "options": {
+                        "template": "src/context.ttl.j2",
+                        "content-type": "text/ttl",
+                        "extension": "ttl"
+                    }
+                }
+            ]
+        }
+    ],
+    "_tdk": {
+        "version": "3.23.0",
+        "readmeFile": "README.md",
+        "files": [
+            "src/all.ttl.j2",
+            "src/knowledge-model.ttl.j2",
+            "src/questionnaire-replies.ttl.j2",
+            "src/context.ttl.j2",
+            "src/prefixes.ttl.j2",
+            "src/macros/macro-context.ttl.j2",
+            "src/macros/macro-knowledge-model.ttl.j2",
+            "src/macros/macro-questionnaire-replies.ttl.j2"
+        ]
+    }
+}
