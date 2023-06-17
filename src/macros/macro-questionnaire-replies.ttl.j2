@@ -37,7 +37,8 @@ questionnaireVersion:{{version.uuid}} a dsw:QuestionnaireVersion ;
   dsw:createdAt "{{reply.createdAt}}"^^xsd:dateTime ;
   {%- if reply.createdBy.uuid %}
   dsw:isCreatedBy user:{{reply.createdBy.uuid}} ;
-  {%- endif %}
+  {%- do simpleAuthors.update({ reply.createdBy.uuid : reply.createdBy}) -%}
+  {%- endif -%}
  {%- set listOfUuids = replyPath.split('.') %}
   dsw:isReplyTo km:{{listOfUuids|last}} ;
 {%- endmacro -%}
@@ -46,7 +47,6 @@ questionnaireVersion:{{version.uuid}} a dsw:QuestionnaireVersion ;
 reply:{{replyPath}} a dsw:ValueReply ;
   dsw:path "{{replyPath}}" ;
   {{ renderReply(replyPath, reply) }}
-  {%- do simpleAuthors.update({ reply.createdBy.uuid : reply.createdBy}) -%}
   {%- set listOfUuids = replyPath.split('.') %}
   {%- set questionUuid = listOfUuids|last -%}
   {%- set type = ctx.knowledgeModel.entities.questions[questionUuid].valueType -%} 
@@ -80,7 +80,6 @@ reply:{{replyPath}} a dsw:ItemListReply ;
   {%- if replies|length > 0 %}
   dsw:replyValue {{ replies.split(',')|join(", ")}} .
   
-  {%- do simpleAuthors.update({ reply.createdBy.uuid: reply.createdBy}) -%}
   {%- endif -%}
 
 {%- endmacro -%}
@@ -103,7 +102,6 @@ reply:{{replyPath}} a dsw:PlainTypeIntegrationReply ;
 {%- endif %}
   {{ renderReply(replyPath, reply) }}
   dsw:replyValue {{reply.value.value.value|tojson}} .
-  {%- do simpleAuthors.update({ reply.createdBy.uuid: reply.createdBy}) -%}
 {%- endmacro -%}
 
 {%- macro renderMultiChoiceReply(replyPath, reply, index) -%}
@@ -118,7 +116,6 @@ reply:{{replyPath}} a dsw:MultiChoiceReply ;
   dsw:replyValue {{choicesUuid.split(',')|join(", ")}} .
 
   {%- endif-%}
-  {%- do simpleAuthors.update({ reply.createdBy.uuid: reply.createdBy}) -%}
 {%- endmacro -%}
 
 {%- macro renderAnswerReply(replyPath, reply, index) -%}
@@ -129,7 +126,6 @@ reply:{{replyPath}} a dsw:AnswerReply ;
   dsw:answerReplyValue km:{{reply.value.value}} ;
   {%- endif %}
   dsw:path "{{replyPath}}" .
-  {%- do simpleAuthors.update({ reply.createdBy.uuid: reply.createdBy}) -%}
 {%- endmacro -%}
 
 {#- ------------------------------------------------------------------------------------ -#}
@@ -204,3 +200,49 @@ questionnaire:{{ctx.questionnaireUuid}} a dsw:Questionnaire ;
 
   {%- endif %}
 {%- endfor %}
+
+{#- ------------------------------------------------------------------------------------ -#}
+{#-  USER                                                                                -#}
+{#- ------------------------------------------------------------------------------------ -#}
+
+{%- for simpleAuthorsItem in simpleAuthors -%}
+{%- if simpleAuthorsItem != ctx.createdBy.uuid  -%}
+{%- set simpleAuthor = simpleAuthors[simpleAuthorsItem] %}
+
+user:{{simpleAuthor.uuid}} a dsw:User;
+  dsw:uuid "{{simpleAuthor.uuid}}" ;
+  {%- if simpleAuthor.imageUrl %}
+  dsw:imageUrl "{{simpleAuthor.imageUrl}}"^^schema:URL ;
+  {%- endif %}
+  dsw:firstName {{simpleAuthor.firstName|tojson}} ;
+  dsw:lastName {{simpleAuthor.lastName|tojson}} .
+{%- endif -%}
+{%- endfor -%}
+
+{%- set user = ctx.createdBy %}
+
+user:{{user.uuid}} a dsw:User ;
+  dsw:uuid "{{user.uuid}}" ;
+  dsw:firstName {{user.firstName|tojson}} ;
+  dsw:lastName {{user.lastName|tojson}} ;
+  {%- if user.imageUrl %}
+  dsw:imageUrl "{{user.imageurl}}" ;
+  {%- endif %}
+  dsw:email {{user.email|tojson}};
+  dsw:role {{user.role|tojson}} ;
+  
+  {%- if user.affiliation %}
+  dsw:affiliation {{user.affiliation}} ;
+  {%- endif -%}
+
+  {%- set premissions = makeList(user.premissions, '"', '"') -%}
+  {%- if premissions|length > 0 %}
+  dsw:premission {{ premissions.split(',')|join(", ")}} .
+  {%- endif -%}
+  
+  {%- set sources = makeList(user.sources, '"', '"') -%}
+  {%- if sources|length > 0 %}
+  dsw:source {{ sources.split(',')|join(", ")}} ;
+  {%- endif %}
+  dsw:createdAt "{{user.createdAt}}"^^xsd:dateTime ;
+  dsw:updatedAt "{{user.updatedAt}}"^^xsd:dateTime .
