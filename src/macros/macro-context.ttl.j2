@@ -2,7 +2,7 @@
 {#-  GENERAL MACROS                                                                      -#}
 {#- ------------------------------------------------------------------------------------ -#}
 
-{%- macro renderList(list, strBefore, strAfter) -%}
+{%- macro makeList(list, strBefore, strAfter) -%}
   {%- set resultList = [] -%}
     {%- for item in list -%}
     {%- do resultList.append(strBefore+item+strAfter) -%}
@@ -67,7 +67,7 @@ organization:{{ctx.organization.organizationId}} a dsw:Organization ;
   dsw:organizationId "{{ctx.organization.organizationId}}" ;
   dsw:title {{ctx.organization.name|tojson}} ;
   dsw:description {{ctx.organization.description|tojson}} 
-  {%- set affiliations = renderList(ctx.organization.affiliations, '"', '"') -%}
+  {%- set affiliations = makeList(ctx.organization.affiliations, '"', '"') -%}
   {%- if affiliations|length > 0 %} ;
   dsw:affiliation {{ affiliations.split(',')|join(", ")}}
   {%- endif -%} .
@@ -137,48 +137,3 @@ report:totalReport a dsw:TotalReportItem ;
 
 {{ renderChapterReport(chapterReport, loop.index) }}
 {% endfor %}
-
-{#- ------------------------------------------------------------------------------------ -#}
-{#-  USER                                                                                -#}
-{#- ------------------------------------------------------------------------------------ -#}
-
-{%- for simpleAuthorsItem in simpleAuthors -%}
-{%- if simpleAuthorsItem != ctx.createdBy.uuid -%}
-{%- set simpleAuthor = simpleAuthors[simpleAuthorsItem] -%}
-user:{{simpleAuthor.uuid}} a dsw:User;
-  dsw:uuid "{{simpleAuthor.uuid}}" ;
-  dsw:firstName {{simpleAuthor.firstName|tojson}} ;
-  dsw:lastName {{simpleAuthor.lastName|tojson}} ;
-  {%- if simpleAuthor.imageUrl %}
-  dsw:imageUrl "{{simpleAuthor.imageUrl}}"^^schema:URL ;
-  {%- endif -%}
-{%- endif -%}
-{%- endfor -%}
-
-{%- set user = ctx.createdBy %}
-
-user:{{user.uuid}} a dsw:User ;
-  dsw:uuid "{{user.uuid}}" ;
-  dsw:firstName {{user.firstName|tojson}} ;
-  dsw:lastName {{user.lastName|tojson}} ;
-  {%- if user.imageUrl %}
-  dsw:imageUrl "{{user.imageurl}}" ;
-  {%- endif %}
-  dsw:email {{user.email|tojson}};
-  dsw:role {{user.role|tojson}} ;
-  
-  {%- if user.affiliation %}
-  dsw:affiliation {{user.affiliation}} ;
-  {%- endif -%}
-
-  {%- set premissions = renderList(user.premissions, '"', '"') -%}
-  {%- if premissions|length > 0 %}
-  dsw:premission {{ premissions.split(',')|join(", ")}} .
-  {%- endif -%}
-  
-  {%- set sources = renderList(user.sources, '"', '"') -%}
-  {%- if sources|length > 0 %}
-  dsw:source {{ sources.split(',')|join(", ")}} ;
-  {%- endif %}
-  dsw:createdAt "{{user.createdAt}}"^^xsd:dateTime ;
-  dsw:updatedAt "{{user.updatedAt}}"^^xsd:dateTime .
