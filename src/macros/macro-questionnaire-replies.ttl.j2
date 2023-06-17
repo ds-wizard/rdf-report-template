@@ -2,7 +2,7 @@
 {#-  GENERAL MACROS                                                                      -#}
 {#- ------------------------------------------------------------------------------------ -#}
 
-{%- macro renderList(list, strBefore, strAfter) -%}
+{%- macro makeList(list, strBefore, strAfter) -%}
   {%- set resultList = [] -%}
     {%- for item in list -%}
     {%- do resultList.append(strBefore+item+strAfter) -%}
@@ -35,7 +35,9 @@ questionnaireVersion:{{version.uuid}} a dsw:QuestionnaireVersion ;
 
 {%- macro renderReply(replyPath, reply) -%}
   dsw:createdAt "{{reply.createdAt}}"^^xsd:dateTime ;
+  {%- if reply.createdBy.uuid %}
   dsw:isCreatedBy user:{{reply.createdBy.uuid}} ;
+  {%- endif %}
  {%- set listOfUuids = replyPath.split('.') %}
   dsw:isReplyTo km:{{listOfUuids|last}} ;
 {%- endmacro -%}
@@ -74,7 +76,7 @@ reply:{{replyPath}} a dsw:ItemListReply ;
   dsw:path "{{replyPath}}" ;
   {{ renderReply(replyPath, reply) }}
 
-  {%- set replies = renderList(reply.value.value, '"', '"') -%}
+  {%- set replies = makeList(reply.value.value, '"', '"') -%}
   {%- if replies|length > 0 %}
   dsw:replyValue {{ replies.split(',')|join(", ")}} .
   
@@ -109,8 +111,8 @@ reply:{{replyPath}} a dsw:MultiChoiceReply ;
   dsw:path "{{replyPath}}" ;
   {{ renderReply(replyPath, reply) }}
   
-  {%- set choicesUuidPrefix = renderList(reply.value.value, "km:", "") -%}
-  {%- set choicesUuid = renderList(reply.value.value, '"', '"') -%}
+  {%- set choicesUuidPrefix = makeList(reply.value.value, "km:", "") -%}
+  {%- set choicesUuid = makeList(reply.value.value, '"', '"') -%}
   {%- if choicesUuidPrefix|length > 0 %}
   dsw:multiChoiceReplyValue {{ choicesUuidPrefix.split(',')|join(", ")}} ;
   dsw:replyValue {{choicesUuid.split(',')|join(", ")}} .
@@ -140,7 +142,7 @@ questionnaire:{{ctx.questionnaireUuid}} a dsw:Questionnaire ;
   {%- if ctx.questionnaireDescription -%}
   dsw:description {{ctx.questionnaireDescription|tojson}} ;
   {%- endif -%}
-  {%- set projectTags = renderList(ctx.questionnaireProjectTags, '"','"') -%}
+  {%- set projectTags = makeList(ctx.questionnaireProjectTags, '"','"') -%}
   {%- if projectTags|length > 0 %}
   dsw:hasProjectTag {{ projectTags.split(',')|join(", ")}} ;
   {%- endif %}
@@ -155,8 +157,10 @@ questionnaire:{{ctx.questionnaireUuid}} a dsw:Questionnaire ;
   {%- endif %}
   dsw:hasPhase km:{{ctx.phaseUuid}} ;
   dsw:hasDocument document:{{ctx.uuid}} ;
-  dsw:usesKnowledgeModel km:{{ ctx.knowledgeModel.uuid }} ;
-  dsw:isCreatedBy user:{{ctx.createdBy.uuid}} . 
+  {%- if ctx.createdBy.uuid %}
+  dsw:isCreatedBy user:{{ctx.createdBy.uuid}} ;
+  {%- endif %}
+  dsw:usesKnowledgeModel km:{{ ctx.knowledgeModel.uuid }} .
 
 {#- ------------------------------------------------------------------------------------ -#}
 {#-  QUESTIONNAIRE VERSION                                                               -#}
