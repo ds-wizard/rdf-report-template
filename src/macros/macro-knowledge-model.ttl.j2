@@ -511,10 +511,10 @@ km:{{ ctx.knowledgeModel.uuid }} a dsw:KnowledgeModel ;
 {#-  QUESTION                                                                            -#}
 {#- ------------------------------------------------------------------------------------ -#}
 
-{%- set optionsQuestionAnswerUuidParent = {} -%} {# Dict kde key je uuid answer a value je uuid otazky, ktera je jeji parent #}
-{%- set multiChoiceQuestionChoiceUuidParent = {} -%} {# Dict kde key je uuid choice a value je uuid otazky, ktera je jeji parent #}
-{%- set questionExpertUuidParent = {} -%} {# Dict kde key je uuid expert a value je uuid otazky, ktera je jeji parent #}
-{%- set questionReferenceUuidParent = {} -%} {# Dict kde key je uuid reference a value je uuid otazky, ktera je jeji parent #}
+{%- set optionsQuestionAnswerUuidParent = {} -%} {# Dictionary where the key is the uuid of an answer and vaule is the uuid of a question, which is its parent #}
+{%- set multiChoiceQuestionChoiceUuidParent = {} -%} {# Dictionary where the key is the uuid of a choice and vaule is the uuid of a question, which is its parent #}
+{%- set questionExpertUuidParent = {} -%} {# Dictionary where the key is the uuid of an expert and vaule is the uuid of a question, which is its parent #}
+{%- set questionReferenceUuidParent = {} -%} {# Dictionary where the key is the uuid of a reference and vaule is the uuid of a question, which is its parent #}
 
 {%- set expertOrder = {} -%}
 {%- set answerOrder = {} -%}
