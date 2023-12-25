@@ -1,6 +1,6 @@
 {
     "templateId": "rdf-report",
-    "organizationId": "ontojana",
+    "organizationId": "dsw",
     "version": "0.1.0",
     "name": "RDF Report",
     "description": "Transforms a questionnaire into an RDF document",
