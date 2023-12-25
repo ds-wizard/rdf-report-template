@@ -1,11 +1,11 @@
 {
     "templateId": "rdf-report",
     "organizationId": "ontojana",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "name": "RDF Report",
-    "description": "This template transforms a questionnaire into a RDF document.",
+    "description": "Transforms a questionnaire into an RDF document",
     "license": "Apache-2.0",
-    "metamodelVersion": 11,
+    "metamodelVersion": 12,
     "allowedPackages": [
         {
             "orgId": null,
@@ -17,7 +17,7 @@
     "formats": [
         {
             "uuid": "0d535fe6-c966-4908-8af7-b284a9b36e34",
-            "name": "all RDF in TTL",
+            "name": "Full RDF (Turtle)",
             "icon": "fas fa-file",
             "steps": [
                 {
@@ -32,7 +32,7 @@
         },
         {
             "uuid": "bc842fc0-da0e-47b3-beff-f03e491d6c90",
-            "name": "knowledge-model RDF in TTL",
+            "name": "KM RDF (Turtle)",
             "icon": "fas fa-file",
             "steps": [
                 {
@@ -47,7 +47,7 @@
         },
         {
             "uuid": "f14e3cff-77f7-481d-8b5c-551799aaf1a9",
-            "name": "questionnaire-replies RDF in TTL",
+            "name": "Replies RDF (Turtle)",
             "icon": "fas fa-file",
             "steps": [
                 {
@@ -62,7 +62,7 @@
         },
         {
             "uuid": "eadd6322-b732-4f56-a3e9-de2cf62c1f51",
-            "name": "context RDF in TTL",
+            "name": "Context RDF (Turtle)",
             "icon": "fas fa-file",
             "steps": [
                 {
@@ -77,17 +77,11 @@
         }
     ],
     "_tdk": {
-        "version": "3.23.0",
+        "version": "4.1.0",
         "readmeFile": "README.md",
         "files": [
-            "src/all.ttl.j2",
-            "src/knowledge-model.ttl.j2",
-            "src/questionnaire-replies.ttl.j2",
-            "src/context.ttl.j2",
-            "src/prefixes.ttl.j2",
-            "src/macros/macro-context.ttl.j2",
-            "src/macros/macro-knowledge-model.ttl.j2",
-            "src/macros/macro-questionnaire-replies.ttl.j2"
+            "src/**/*",
+            "/LICENSE"
         ]
     }
 }
