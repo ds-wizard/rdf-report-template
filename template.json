@@ -1,7 +1,7 @@
 {
     "templateId": "rdf-report",
     "organizationId": "dsw",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "name": "RDF Report",
     "description": "Transforms a questionnaire into an RDF document",
     "license": "Apache-2.0",
