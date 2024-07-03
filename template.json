@@ -1,11 +1,11 @@
 {
-    "templateId": "rdf-report",
-    "organizationId": "ontojana",
+    "templateId": "rdf-report-template",
+    "organizationId": "dsw",
     "version": "0.1.0",
     "name": "RDF Report",
     "description": "Transforms a questionnaire into an RDF document",
     "license": "Apache-2.0",
-    "metamodelVersion": 12,
+    "metamodelVersion": 13,
     "allowedPackages": [
         {
             "orgId": null,
