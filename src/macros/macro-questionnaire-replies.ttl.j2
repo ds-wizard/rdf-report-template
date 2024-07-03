@@ -18,9 +18,7 @@
 questionnaireVersion:{{version.uuid}} a dsw:QuestionnaireVersion ;
   dsw:uuid "{{version.uuid}}" ;
   dsw:eventUuid "{{version.eventUuid}}" ;
-  {%- if version.name -%}
   dsw:title {{version.name|tojson}} ;
-  {%- endif -%}
   {%- if version.description %}
   dsw:description {{version.description|tojson}} ;
   {%- endif %}
@@ -57,9 +55,7 @@ reply:{{replyPath}} a dsw:ValueReply ;
   dsw:urlReplyValue <{{reply.value.value}}> ;
 
   {%- elif type == "StringQuestionValueType" or type == "TextQuestionValueType" or type == "EmailQuestionValueType" or type == "ColorQuestionValueType"%}
-  {%- if reply.value.value -%}
   dsw:replyValue {{reply.value.value|tojson}} 
-  {%- endif -%}
 
   {%- elif type == "NumberQuestionValueType" %}
   dsw:numberReplyValue  "{{reply.value.value}}"^^xsd:float ;
@@ -103,10 +99,7 @@ reply:{{replyPath}} a dsw:PlainTypeIntegrationReply ;
   dsw:path "{{replyPath}}" ;
 {%- endif %}
   {{ renderReply(replyPath, reply) }}
-  {%- if reply.value.value.value -%}
-  dsw:replyValue {{reply.value.value.value|tojson}}
-  {%- endif -%}
-  .
+  dsw:replyValue {{reply.value.value.value|tojson}} .
 {%- endmacro -%}
 
 {%- macro renderMultiChoiceReply(replyPath, reply, index) -%}
@@ -139,9 +132,7 @@ reply:{{replyPath}} a dsw:AnswerReply ;
 
 questionnaire:{{ctx.questionnaireUuid}} a dsw:Questionnaire ;
   dsw:uuid "{{ctx.questionnaireUuid}}" ;
-  {%- if ctx.questionnaireName -%}
   dsw:title {{ctx.questionnaireName|tojson}} ;
-  {%- endif -%}
   {%- if ctx.questionnaireDescription -%}
   dsw:description {{ctx.questionnaireDescription|tojson}} ;
   {%- endif -%}
@@ -221,10 +212,8 @@ user:{{simpleAuthor.uuid}} a dsw:User;
   {%- if simpleAuthor.imageUrl %}
   dsw:imageUrl "{{simpleAuthor.imageUrl}}"^^schema:URL ;
   {%- endif %}
-  {%- if simpleAuthor.firstName and simpleAuthor.lastName -%}
   dsw:firstName {{simpleAuthor.firstName|tojson}} ;
-  dsw:lastName {{simpleAuthor.lastName|tojson}} 
-  {%- endif -%} .
+  dsw:lastName {{simpleAuthor.lastName|tojson}} .
 {%- endif -%}
 {%- endfor -%}
 
@@ -232,17 +221,13 @@ user:{{simpleAuthor.uuid}} a dsw:User;
 
 user:{{user.uuid}} a dsw:User ;
   dsw:uuid "{{user.uuid}}" ;
-  {%- if user.firstName and user.lastName -%}
   dsw:firstName {{user.firstName|tojson}} ;
   dsw:lastName {{user.lastName|tojson}} ;
-  {%- endif -%}
   {%- if user.imageUrl %}
   dsw:imageUrl "{{user.imageurl}}" ;
   {%- endif %}
-  {%-if user.email and user.role -%}
   dsw:email {{user.email|tojson}};
   dsw:role {{user.role|tojson}} ;
-  {%- endif -%}
   
   {%- if user.affiliation %}
   dsw:affiliation {{user.affiliation}} ;
