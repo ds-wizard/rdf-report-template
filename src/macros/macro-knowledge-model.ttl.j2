@@ -53,7 +53,9 @@ km:{{expert.uuid}} a dsw:Expert ;
   {%- if expert.annotations %}
   {{ renderAnnotation(expert.annotations) }} ;
   {%- endif %}
+  {%- if expertOrder[expert.uuid] -%}
   dsw:order "{{expertOrder[expert.uuid]}}"^^xsd:integer ;
+  {%- endif -%}
   dsw:hasParent km:{{questionExpertUuidParent[expert.uuid]}} .
 {%- endmacro -%}
 
@@ -99,7 +101,9 @@ km:{{chapter.uuid}} a dsw:Chapter ;
   {{ renderAnnotation(reference.annotations) }} ;
   {%- endif %}
   dsw:hasParent km:{{questionReferenceUuidParent[reference.uuid]}} ;
+  {%- if referenceOrder[reference.uuid] -%}
   dsw:order "{{referenceOrder[reference.uuid]}}"^^xsd:integer ;
+  {%- endif -%}
 {%- endmacro -%}
 
 {%- macro renderURLReference(reference, index) -%}
@@ -112,7 +116,7 @@ km:{{reference.uuid}} a dsw:URLReference ;
 {%- macro renderResourcePageReference(reference, index) -%}
 km:{{reference.uuid}} a dsw:ResourcePageReference ;
   {{renderReference(reference)}}
-  dsw:shortUuid "{{reference.shortUuid}}" .
+  dsw:shortUuid "{{reference.resourcePageUuid}}" .
 {%- endmacro -%}
 
 {#- ------------------------------------------------------------------------------------ -#}
@@ -155,9 +159,7 @@ km:{{integration.uuid}} a dsw:ApiIntegration ;
   {%- endif %}
   dsw:rqBody "{{integration.requestBody}}" ;
   dsw:rqEmptySearch "{{integration.requestEmptySearch}}"^^xsd:boolean ;
-  dsw:rsListField "{{integration.responseLisField}}" ;
-  dsw:rsItemId "{{integration.responseItemId}}" ;
-  dsw:rsListField "{{integration.responseLisField}}" ;
+  dsw:rsListField "{{integration.responseListField}}" ;
   dsw:rsItemId "{{integration.responseItemId}}" ;
   dsw:rsItemTemplate "{{integration.responseItemTemplate}}" .
 {%- endmacro -%}
@@ -402,8 +404,10 @@ km:{{choice.uuid}} a dsw:Choice ;
   {%- if choice.annotations %}
   {{ renderAnnotation(choice.annotations) }} ;
   {%- endif %}
-  dsw:hasParent km:{{multiChoiceQuestionChoiceUuidParent[choice.uuid]}} ;
-  dsw:order "{{choiceOrder[choice.uuid]}}"^^xsd:integer .
+  {%- if choiceOrder[choice.uuid] -%}
+  dsw:order "{{choiceOrder[choice.uuid]}}"^^xsd:integer ;
+  {%- endif -%}
+  dsw:hasParent km:{{multiChoiceQuestionChoiceUuidParent[choice.uuid]}} .
 {%- endmacro -%}
 
 {%- macro renderAnswer(answer, index) -%}
@@ -423,8 +427,10 @@ km:{{answer.uuid}} a dsw:Answer ;
   {%- if answer.annotations %}
   {{ renderAnnotation(answer.annotations) }} ;
   {%- endif %}
-  dsw:hasParent km:{{optionsQuestionAnswerUuidParent[answer.uuid]}} ;
-  dsw:order "{{answerOrder[answer.uuid]}}"^^xsd:integer .
+  {%- if answerOrder[answer.uuid] %}
+  dsw:order "{{answerOrder[answer.uuid]}}"^^xsd:integer ;
+  {%- endif %}
+  dsw:hasParent km:{{optionsQuestionAnswerUuidParent[answer.uuid]}} .
 {%- endmacro -%}
 
 {#- ------------------------------------------------------------------------------------ -#}
