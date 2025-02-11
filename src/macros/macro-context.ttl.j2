@@ -49,14 +49,14 @@ report:chapterReport-{{chapterReport.chapterUuid}} a dsw:ChapterReportItem ;
 {#-  DOCUMENT                                                                            -#}
 {#- ------------------------------------------------------------------------------------  #}
 
-document:{{ctx.uuid}} a dsw:Document ;
-  dsw:uuid "{{ctx.uuid}}" ;
-  dsw:createdAt "{{ctx.createdAt}}"^^xsd:dateTime ;
-  dsw:updatedAt "{{ctx.updatedAt}}"^^xsd:dateTime ;
+document:{{ctx.document.uuid}} a dsw:Document ;
+  dsw:uuid "{{ctx.document.uuid}}" ;
+  dsw:createdAt "{{ctx.document.createdAt}}"^^xsd:dateTime ;
+ {#- dsw:updatedAt "{{ctx.document.updatedAt}}"^^xsd:dateTime ; -#}
   dsw:hasKnowledgeModel km:{{ctx.knowledgeModel.uuid}} ;
   dsw:hasOrganization organization:{{ctx.organization.organizationId}} ;
   dsw:hasContextConfig ctxConfig:contextConfig ;
-  dsw:hasQuestionnaire questionnaire:{{ctx.questionnaireUuid}} ;
+  dsw:hasQuestionnaire questionnaire:{{ctx.questionnaire.uuid}} ;
   dsw:hasReport report:{{ctx.report.uuid}} .
 
 {#- ------------------------------------------------------------------------------------ -#}
@@ -78,7 +78,7 @@ organization:{{ctx.organization.organizationId}} a dsw:Organization ;
 
 ctxConfig:contextConfig a dsw:ContextConfig ;
   dsw:clientUrl "{{ctx.config.clientUrl}}"^^schema:URL ;
-  dsw:documentTemplateMetamodelVersion "{{ctx.documentTemplateMetamodelVersion}}"^^xsd:integer .
+  dsw:documentTemplateMetamodelVersion "{{ctx.metamodelVersion}}"^^xsd:integer .
 {#- ------------------------------------------------------------------------------------ -#}
 {#-  REPORT                                                                              -#}
 {#- ------------------------------------------------------------------------------------ #}
@@ -108,7 +108,7 @@ report:totalReport a dsw:TotalReportItem ;
   {%- for metric in ctx.report.totalReport.metrics %}
     [ a dsw:ReportMetric ;
       dsw:resultMeasure "{{metric.measure}}"^^xsd:float ;
-      dsw:hasMetric km:{{metric.metric}} ] 
+      dsw:hasMetric km:{{metric.metricUuid}} ] 
       {%- if not loop.last -%} ,
       {%- elif ctx.report.totalReport.indications -%} ;
       {%- else -%} .
@@ -132,8 +132,6 @@ report:totalReport a dsw:TotalReportItem ;
 {#- ------------------------------------------------------------------------------------ -#}
 {#-  CHAPTER REPORT                                                                      -#}
 {#- ------------------------------------------------------------------------------------ #}
-
-{%- for chapterReport in ctx.report.chapterReports %}
-
+{% for chapterReport in ctx.report.chapterReports %}
 {{ renderChapterReport(chapterReport, loop.index) }}
 {% endfor %}

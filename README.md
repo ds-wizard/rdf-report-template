@@ -29,6 +29,10 @@ This template is released under Apache Licence, version 2. Read the LICENSE file
 
 ## Changelog
 
+### 0.3.0
+
+- Update to metamodel version 16
+
 ### 0.2.0
 
 - Update to metamodel version 13
