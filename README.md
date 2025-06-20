@@ -29,6 +29,11 @@ This template is released under Apache Licence, version 2. Read the LICENSE file
 
 ## Changelog
 
+### 0.4.0
+
+- Fix integration question template rendering
+- Add Item Select Question, File Question
+
 ### 0.3.0
 
 - Update to metamodel version 16

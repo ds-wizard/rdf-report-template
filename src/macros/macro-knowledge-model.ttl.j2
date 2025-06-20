@@ -161,7 +161,7 @@ km:{{integration.uuid}} a dsw:ApiIntegration ;
   dsw:rqEmptySearch "{{integration.requestEmptySearch}}"^^xsd:boolean ;
   dsw:rsListField "{{integration.responseListField}}" ;
   dsw:rsItemId "{{integration.responseItemId}}" ;
-  dsw:rsItemTemplate "{{integration.responseItemTemplate}}" .
+  dsw:rsItemTemplate {{integration.responseItemTemplate|tojson}} .
 {%- endmacro -%}
 
 {%- macro renderWidgetIntegration(integration, index) -%}
@@ -254,7 +254,7 @@ km:{{metric.uuid}} a dsw:Metric ;
 
 {%- macro renderReplyByLastUuid(question) -%}
   {%- set replies = []-%}
-  {%- for reply in ctx.questionnaireReplies -%}
+  {%- for reply in ctx.questionnaire.replies -%}
     {%- if reply.endswith('.'+question.uuid) -%}
     {%- do replies.append("reply:"+reply) -%}
     {%- endif -%}
@@ -364,7 +364,7 @@ km:{{question.uuid}} a dsw:MultiChoiceQuestion ;
 
   {%- set replies = renderReplyByLastUuid(question) -%}
   
-  {%- if replies|length > 0 -%} ;
+  {%- if replies|length > 0 %}
   dsw:hasReply {{ replies.split(',')|join(", ")}} ;
   {%- endif %}
   dsw:hasParent km:{{parentUuid}} .
@@ -372,6 +372,39 @@ km:{{question.uuid}} a dsw:MultiChoiceQuestion ;
   {% do multiChoiceQuestionChoiceUuidParent.update({ choiceUuid : question.uuid}) -%}
   {%- do choiceOrder.update({ choiceUuid : loop.index}) -%}
   {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro renderItemSelectQuestion(question, parentUuid, index) -%}
+km:{{question.uuid}} a dsw:ItemSelectQuestion ;
+  dsw:uuid "{{question.uuid}}" ;
+  {{renderQuestion(question, index)}}
+  {%- if question.listQuestionUuid %}
+  dsw:hasListQuestion km:{{question.listQuestionUuid}} ;
+  {%- endif %}
+  {%- set replies = renderReplyByLastUuid(question) -%}
+  
+  {%- if replies|length > 0 %}
+  dsw:hasReply {{ replies.split(',')|join(", ")}} ;
+  {%- endif %}
+  dsw:hasParent km:{{parentUuid}} .
+{%- endmacro -%}
+
+{%- macro renderFileQuestion(question, parentUuid, index) -%}
+km:{{question.uuid}} a dsw:FileQuestion ;
+  dsw:uuid "{{question.uuid}}" ;
+  {{renderQuestion(question, index)}}
+  {%- if question.fileTypes %}
+  dsw:fileTypes "{{question.fileTypes}}" ;
+  {%- endif %}
+  {%- if question.maxSize %}
+  dsw:maxSize "{{question.maxSize}}"^^xsd:integer
+  {%- endif %}
+  {%- set replies = renderReplyByLastUuid(question) -%}
+  
+  {%- if replies|length > 0 %}
+  dsw:hasReply {{ replies.split(',')|join(", ")}} ;
+  {%- endif %}
+  dsw:hasParent km:{{parentUuid}} .
 {%- endmacro -%}
 
 {%- macro renderQuestionType (question, parentUuid, index) -%}
@@ -389,8 +422,14 @@ km:{{question.uuid}} a dsw:MultiChoiceQuestion ;
 {{ renderIntegrationQuestion(question, parentUuid, index) }} 
     {%- elif question.questionType == "MultiChoiceQuestion" %}
     
-{{ renderMultiChoiceQuestion(question, parentUuid, index) }} 
-    {%- endif %}
+{{ renderMultiChoiceQuestion(question, parentUuid, index) }}
+    {%- elif question.questionType == "ItemSelectQuestion" %}
+
+{{ renderItemSelectQuestion(question, parentUuid, index) }}
+    {%- elif question.questionType == "FileQuestion" %}
+
+{{ renderFileQuestion(question, parentUuid, index) }}
+    {%- endif -%}
 {%- endmacro %}
 
 {#- ------------------------------------------------------------------------------------ -#}

@@ -2,6 +2,8 @@
 {#-  GENERAL MACROS                                                                      -#}
 {#- ------------------------------------------------------------------------------------ -#}
 
+{%- set dc = ctx|to_context_obj -%}
+
 {%- macro makeList(list, strBefore, strAfter) -%}
   {%- set resultList = [] -%}
     {%- for item in list -%}
@@ -42,14 +44,13 @@ questionnaireVersion:{{version.uuid}} a dsw:QuestionnaireVersion ;
   {%- do simpleAuthors.update({ reply.createdBy.uuid : reply.createdBy}) -%}
   {%- endif -%}
  {%- set listOfUuids = replyPath.split('.') %}
-  dsw:isReplyTo km:{{listOfUuids|last}} ;
+  dsw:isReplyTo km:{{listOfUuids|last}}
 {%- endmacro -%}
 
 {%- macro renderStringReply(replyPath, reply, index) %}
 
 reply:{{replyPath}} a dsw:ValueReply ;
   dsw:path "{{replyPath}}" ;
-  {{ renderReply(replyPath, reply) }}
   {%- set listOfUuids = replyPath.split('.') %}
   {%- set questionUuid = listOfUuids|last -%}
   {%- set type = ctx.knowledgeModel.entities.questions[questionUuid].valueType -%} 
@@ -59,34 +60,35 @@ reply:{{replyPath}} a dsw:ValueReply ;
 
   {%- elif type == "StringQuestionValueType" or type == "TextQuestionValueType" or type == "EmailQuestionValueType" or type == "ColorQuestionValueType" %}
   {%- if reply.value.value %}
-  dsw:replyValue {{reply.value.value|tojson}} .
+  dsw:replyValue {{reply.value.value|tojson}} ;
   {%- endif -%}
 
   {%- elif type == "NumberQuestionValueType" %}
-  dsw:numberReplyValue  "{{reply.value.value}}"^^xsd:float .
+  dsw:numberReplyValue  "{{reply.value.value}}"^^xsd:float ;
 
   {%- elif type == "DateQuestionValueType" %}
-  dsw:dateReplyValue  "{{reply.value.value}}"^^xsd:date .
+  dsw:dateReplyValue  "{{reply.value.value}}"^^xsd:date ;
 
   {%- elif type == "DateTimeQuestionValueType" %}
-  dsw:dateTimeReplyValue  "{{reply.value.value}}"^^xsd:dateTime .
+  dsw:dateTimeReplyValue  "{{reply.value.value}}"^^xsd:dateTime ;
 
   {%- elif type == "TimeQuestionValueType" %}
-  dsw:timeReplyValue  "{{reply.value.value}}"^^xsd:time .
-  {%- endif %} .
+  dsw:timeReplyValue  "{{reply.value.value}}"^^xsd:time ;
+  {%- endif %}
+  {{ renderReply(replyPath, reply) }} .
 {%- endmacro -%}
 
 {%- macro renderItemListReply(replyPath, reply, index) %}
 
 reply:{{replyPath}} a dsw:ItemListReply ;
   dsw:path "{{replyPath}}" ;
-  {{ renderReply(replyPath, reply) }}
 
   {%- set replies = makeList(reply.value.value, '"', '"') -%}
   {%- if replies|length > 0 %}
-  dsw:replyValue {{ replies.split(',')|join(", ")}} .
+  dsw:replyValue {{ replies.split(',')|join(", ")}} ;
   
-  {%- endif -%}
+  {%- endif %}
+  {{ renderReply(replyPath, reply) }} .
 
 {%- endmacro -%}
 
@@ -106,37 +108,64 @@ reply:{{replyPath}} a dsw:IntegrationTypeIntegrationReply ;
 reply:{{replyPath}} a dsw:PlainTypeIntegrationReply ;
   dsw:path "{{replyPath}}" ;
 {%- endif %}
-  {{ renderReply(replyPath, reply) }}
   {%- if reply.value.value.value %}
-  dsw:replyValue {{reply.value.value.value|tojson}}
-  {%- endif -%}
-  .
+  dsw:replyValue {{reply.value.value.value|tojson}} ;
+  {%- endif %}
+  {{ renderReply(replyPath, reply) }} .
 {%- endmacro -%}
 
 {%- macro renderMultiChoiceReply(replyPath, reply, index) %}
 
 reply:{{replyPath}} a dsw:MultiChoiceReply ;
   dsw:path "{{replyPath}}" ;
-  {{ renderReply(replyPath, reply) }}
-  
   {%- set choicesUuidPrefix = makeList(reply.value.value, "km:", "") -%}
   {%- set choicesUuid = makeList(reply.value.value, '"', '"') -%}
   {%- if choicesUuidPrefix|length > 0 %}
   dsw:multiChoiceReplyValue {{ choicesUuidPrefix.split(',')|join(", ")}} ;
-  dsw:replyValue {{choicesUuid.split(',')|join(", ")}} .
+  dsw:replyValue {{choicesUuid.split(',')|join(", ")}} ;
 
-  {%- endif-%}
+  {%- endif %}
+  {{ renderReply(replyPath, reply) }} .
 {%- endmacro -%}
 
 {%- macro renderAnswerReply(replyPath, reply, index) %}
 
 reply:{{replyPath}} a dsw:AnswerReply ;
-  {{ renderReply(replyPath, reply) }}
   {%- if reply.value.value %}
   dsw:replyValue "{{reply.value.value}}" ;
   dsw:answerReplyValue km:{{reply.value.value}} ;
   {%- endif %}
+  {{ renderReply(replyPath, reply) }} ;
   dsw:path "{{replyPath}}" .
+{%- endmacro -%}
+
+{%- macro renderItemSelectReply(replyPath, reply, index) %}
+
+reply:{{replyPath}} a dsw:ItemSelectReply ;
+  {%- if reply.value.value %}
+  dsw:replyValue "{{reply.value.value}}" ;
+  {%- endif %}
+  {{ renderReply(replyPath, reply) }} ;
+  dsw:path "{{replyPath}}" .
+{%- endmacro -%}
+
+{%- macro renderFileReply(replyPath, reply, index) %}
+
+reply:{{replyPath}} a dsw:FileReply ;
+  {%- if reply.value.value %}
+  dsw:replyValue "{{reply.value.value}}" ;
+
+  {%- set file = dc.questionnaire.files[reply.value.value] %}
+  {%- if file %}
+  dsw:downloadUrl <{{file.download_url}}> ;
+  dsw:name {{file.name|tojson}} ;
+  dsw:size "{{file.size}}"^^xsd:integer ;
+  dsw:fileType {{file.content_type|tojson }} ;
+  {%- endif %}
+  {%- endif %}
+  {{ renderReply(replyPath, reply) }} ;
+  dsw:path "{{replyPath}}" .
+
 {%- endmacro -%}
 
 {#- ------------------------------------------------------------------------------------ -#}
@@ -210,6 +239,14 @@ questionnaire:{{ctx.questionnaire.uuid}} a dsw:Questionnaire ;
   {%- elif reply.value.type == "AnswerReply" -%}
 
   {{renderAnswerReply(replyPath, reply, loop.index)}}
+
+  {%- elif reply.value.type == "ItemSelectReply" -%}
+
+  {{renderItemSelectReply(replyPath, reply, loop.index)}}
+
+  {%- elif reply.value.type == "FileReply" -%}
+
+  {{renderFileReply(replyPath, reply, loop.index)}}
 
   {%- endif %}
 {%- endfor %}
