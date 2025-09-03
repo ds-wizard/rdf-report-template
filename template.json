@@ -1,11 +1,11 @@
 {
     "templateId": "rdf-report",
     "organizationId": "dsw",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "name": "RDF Report",
     "description": "Transforms a questionnaire into an RDF document",
     "license": "Apache-2.0",
-    "metamodelVersion": 16,
+    "metamodelVersion": "17.0",
     "allowedPackages": [
         {
             "orgId": null,
