@@ -93,23 +93,61 @@ reply:{{replyPath}} a dsw:ItemListReply ;
 {%- endmacro -%}
 
 {%- macro renderIntegrationReply(replyPath, reply, index) -%}
-{%- if reply.value.value.type == "IntegrationLegacyType" and reply.value.value.id -%}
+{%- if reply.value.value.type == "IntegrationType" -%}
     {%- set listOfUuids = replyPath.split('.') -%}
     {%- set questionId = listOfUuids|last -%}
     {%- set integrationId = ctx.knowledgeModel.entities.questions[questionId].integrationUuid -%}
-    {%- set integration = ctx.knowledgeModel.entities.integrations[integrationId] %}
+    {%- set integration = ctx.knowledgeModel.entities.integrations[integrationId] -%}
+    {# Different integrations #}
+    {%- set integrationReplyValue = "" -%}
+    {%- set integrationReplyItem = "" -%}
+    {%- set replyObject = reply.value.value.raw -%}
+    {%- if integration.name == "ORCID" -%}
+      {%- set integrationReplyValue = "https://orcid.org/" ~ replyObject["orcid-id"] -%}
+      {%- set integrationReplyItem = replyObject["orcid-id"] -%}
+    {%- elif integration.name == "Crossref (funders)" -%}
+      {%- set integrationReplyValue = replyObject.uri -%}
+      {%- set integrationReplyItem = replyObject.id -%}
+    {%- elif integration.name == "FAIRsharing" -%}
+      {%- set integrationReplyValue = "https://doi.org/" ~ replyObject.doi -%}
+      {%- set integrationReplyItem = replyObject.doi -%}
+    {%- elif integration.name == "ROR (organizations)" -%}
+      {%- set integrationReplyValue = replyObject.id -%}
+      {%- set integrationReplyItem = replyObject.id -%}
+    {%- elif integration.name == "ISO 4217 Currencies" -%}
+      {%- set integrationReplyValue = "https://integrations.ds-wizard.org/currencies?q=" ~ replyObject.code -%}
+      {%- set integrationReplyItem = replyObject.code -%}
+    {%- elif integration.name == "Wikidata" -%}
+      {%- set integrationReplyValue = replyObject.item.value -%}
+      {%- set integrationReplyItem = replyObject.item.value -%}
+    {%- endif %}
 
 reply:{{replyPath}} a dsw:IntegrationTypeIntegrationReply ;
   dsw:path "{{replyPath}}" ;
-  dsw:integrationReplyValue "{{integration.itemUrl | replace("${id}", reply.value.value.id )}}"^^schema:URL ;
-  dsw:integrationReplyItem "{{reply.value.value.id}}" ;
+  dsw:integrationReplyValue "{{integrationReplyValue}}"^^schema:URL ;
+  dsw:integrationReplyItem "{{integrationReplyItem}}" ;
 {%- else %}
 
 reply:{{replyPath}} a dsw:PlainTypeIntegrationReply ;
   dsw:path "{{replyPath}}" ;
 {%- endif %}
   {%- if reply.value.value.value %}
-  dsw:replyValue {{reply.value.value.value|tojson}} ;
+  {# Only use text after the logo image (data:image/png;base64) if present in reply #}
+  {%- set reply_text = reply.value.value.value|string -%}
+  {%- set logo_index = reply_text.find("![Logo](data:image/png;base64") -%}
+  {%- if logo_index != -1 -%}
+    {%- set after_logo = reply_text[logo_index:] -%}
+    {%- set end_logo_index = after_logo.find(")") -%}
+    {%- if end_logo_index != -1 -%}
+      {%- set text_after_logo = after_logo[end_logo_index+1:] -%}
+      {%- set cleaned_reply = text_after_logo.strip() -%}
+      {%- if cleaned_reply -%}
+        dsw:replyValue {{cleaned_reply|tojson}} ;
+      {%- endif -%}
+    {%- endif -%}
+  {%- else -%}
+    dsw:replyValue {{reply_text|tojson}} ;
+  {%- endif -%}
   {%- endif %}
   {{ renderReply(replyPath, reply) }} .
 {%- endmacro -%}

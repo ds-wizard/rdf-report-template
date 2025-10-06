@@ -29,6 +29,10 @@ This template is released under Apache Licence, version 2. Read the LICENSE file
 
 ## Changelog
 
+### 0.6.0
+
+- Update integrations to metamodel version 17.0 (released in DSW 4.22.0)
+
 ### 0.5.0
 
 - Adjusted to template metamodel version 17.0 (released in DSW 4.22.0)
