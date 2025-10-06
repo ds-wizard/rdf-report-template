@@ -115,7 +115,7 @@ reply:{{replyPath}} a dsw:ItemListReply ;
       {%- set integrationReplyValue = replyObject.id -%}
       {%- set integrationReplyItem = replyObject.id -%}
     {%- elif integration.name == "ISO 4217 Currencies" -%}
-      {%- set integrationReplyValue = "https://integrations.ds-wizard.org/currencies?q=" ~ replyObject.id -%}
+      {%- set integrationReplyValue = "https://integrations.ds-wizard.org/currencies?q=" ~ replyObject.code -%}
       {%- set integrationReplyItem = replyObject.code -%}
     {%- elif integration.name == "Wikidata" -%}
       {%- set integrationReplyValue = replyObject.item.value -%}
