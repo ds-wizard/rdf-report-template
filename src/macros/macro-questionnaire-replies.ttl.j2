@@ -101,26 +101,31 @@ reply:{{replyPath}} a dsw:ItemListReply ;
     {# Different integrations #}
     {%- set integrationReplyValue = "" -%}
     {%- set integrationReplyItem = "" -%}
-    {%- set replyObject = reply.value.value.raw -%}
-    {%- if integration.name == "ORCID" -%}
-      {%- set integrationReplyValue = "https://orcid.org/" ~ replyObject["orcid-id"] -%}
-      {%- set integrationReplyItem = replyObject["orcid-id"] -%}
-    {%- elif integration.name == "Crossref (funders)" -%}
-      {%- set integrationReplyValue = replyObject.uri -%}
-      {%- set integrationReplyItem = replyObject.id -%}
-    {%- elif integration.name == "FAIRsharing" -%}
-      {%- set integrationReplyValue = "https://doi.org/" ~ replyObject.doi -%}
-      {%- set integrationReplyItem = replyObject.doi -%}
-    {%- elif integration.name == "ROR (organizations)" -%}
-      {%- set integrationReplyValue = replyObject.id -%}
-      {%- set integrationReplyItem = replyObject.id -%}
-    {%- elif integration.name == "ISO 4217 Currencies" -%}
-      {%- set integrationReplyValue = "https://integrations.ds-wizard.org/currencies?q=" ~ replyObject.code -%}
-      {%- set integrationReplyItem = replyObject.code -%}
-    {%- elif integration.name == "Wikidata" -%}
-      {%- set integrationReplyValue = replyObject.item.value -%}
-      {%- set integrationReplyItem = replyObject.item.value -%}
-    {%- endif %}
+    {%- if reply.value.value.raw -%}
+      {%- set replyObject = reply.value.value.raw -%}
+      {%- if integration.name == "ORCID" -%}
+        {%- set integrationReplyValue = "https://orcid.org/" ~ replyObject["orcid-id"] -%}
+        {%- set integrationReplyItem = replyObject["orcid-id"] -%}
+      {%- elif integration.name == "Crossref (funders)" -%}
+        {%- set integrationReplyValue = replyObject.uri -%}
+        {%- set integrationReplyItem = replyObject.id -%}
+      {%- elif integration.name == "FAIRsharing" -%}
+        {%- set integrationReplyValue = "https://doi.org/" ~ replyObject.doi -%}
+        {%- set integrationReplyItem = replyObject.doi -%}
+      {%- elif integration.name == "ROR (organizations)" -%}
+        {%- set integrationReplyValue = replyObject.id -%}
+        {%- set integrationReplyItem = replyObject.id -%}
+      {%- elif integration.name == "ISO 4217 Currencies" -%}
+        {%- set integrationReplyValue = "https://integrations.ds-wizard.org/currencies?q=" ~ replyObject.code -%}
+        {%- set integrationReplyItem = replyObject.code -%}
+      {%- elif integration.name == "Wikidata" -%}
+        {%- set integrationReplyValue = replyObject.item.value -%}
+        {%- set integrationReplyItem = replyObject.item.value -%}
+      {%- endif %}
+    {%- else -%}
+      {%- set integrationReplyValue = reply.value.value.value.rsplit(" ![]")[0]|replace("**", "")|markdown|replace("<p>", "")|replace("</p>", "") -%}
+      {%- set integrationReplyItem = "" -%}
+    {%- endif -%}
 
 reply:{{replyPath}} a dsw:IntegrationTypeIntegrationReply ;
   dsw:path "{{replyPath}}" ;
