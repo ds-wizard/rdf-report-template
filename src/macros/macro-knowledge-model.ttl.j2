@@ -2,6 +2,8 @@
 {#-  GENERAL MACROS                                                                      -#}
 {#- ------------------------------------------------------------------------------------ -#}
 
+{%- set dc = ctx|to_context_obj -%}
+
 {%- macro renderList(list, strBefore, strAfter) -%}
   {%- set resultList = [] -%}
     {%- for item in list -%}
@@ -254,7 +256,7 @@ km:{{metric.uuid}} a dsw:Metric ;
 
 {%- macro renderReplyByLastUuid(question) -%}
   {%- set replies = []-%}
-  {%- for reply in ctx.questionnaire.replies -%}
+  {%- for reply in ctx.project.replies -%}
     {%- if reply.endswith('.'+question.uuid) -%}
     {%- do replies.append("reply:"+reply) -%}
     {%- endif -%}
@@ -478,11 +480,11 @@ km:{{answer.uuid}} a dsw:Answer ;
 
 km:{{ ctx.knowledgeModel.uuid }} a dsw:KnowledgeModel ;
   dsw:uuid "{{ctx.knowledgeModel.uuid}}" ;
-  dsw:knowledgeModelId "{{ctx.package.kmId}}" ;
-  dsw:title {{ctx.package.name|tojson}} ;
-  dsw:description {{ctx.package.description|tojson}} ;
-  dsw:version "{{ctx.package.version}}" ;
-  dsw:createdAt "{{ctx.package.createdAt}}"^^xsd:dateTime ;
+  dsw:knowledgeModelId "{{dc.pkg.kmId}}" ;
+  dsw:title {{dc.pkg.name|tojson}} ;
+  dsw:description {{dc.pkg.description|tojson}} ;
+  dsw:version "{{dc.pkg.version}}" ;
+  dsw:createdAt "{{dc.pkg.createdAt}}"^^xsd:dateTime ;
   {%- set chapters = renderList(ctx.knowledgeModel.chapterUuids, "km:", "") -%}
   {%- if chapters|length > 0 %}
   dsw:containsChapter {{ chapters.split(',')|join(", ")}}
