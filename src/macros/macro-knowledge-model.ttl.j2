@@ -84,7 +84,7 @@ km:{{chapter.uuid}} a dsw:Chapter ;
 
   {%- set questions = renderList(chapter.questionUuids, "km:", "") -%}
   {%- if questions|length > 0 %}
-  dsw:containsQuestion {{ questions.split(',')|join(", ")}} ;
+  dsw:containsQuestion {{ questions.split(',')|join(",")}} ;
   {%- endif %}
   {%- if chapter.annotations %}
   {{ renderAnnotation(chapter.annotations) }} ;
@@ -134,7 +134,7 @@ km:{{reference.uuid}} a dsw:ResourcePageReference ;
   dsw:order "{{index}}"^^xsd:integer ;
   {%- set props = renderList(integration.props, '"', '"') -%}
   {%- if props|length > 0 %}
-  dsw:prop {{ props.split(',')|join(", ")}} ;
+  dsw:prop {{ props.split(',')|join(",")}} ;
   {%- endif %}
   {%- if integration.annotations %}
   {{ renderAnnotation(integration.annotations) }} ;
@@ -224,7 +224,7 @@ km:{{metric.uuid}} a dsw:Metric ;
   
   {%- set experts = renderList(question.expertUuids, "km:", "") -%}
   {%- if experts|length > 0 %}
-  dsw:containsExpert {{ experts.split(',')|join(", ")}} ;
+  dsw:containsExpert {{ experts.split(',')|join(",")}} ;
     {%- for expert in question.expertUuids -%}
     {%- do questionExpertUuidParent.update({ expert : question.uuid}) -%}
     {%- do expertOrder.update({expert : loop.index}) -%}
@@ -233,7 +233,7 @@ km:{{metric.uuid}} a dsw:Metric ;
   
   {%- set references = renderList(question.referenceUuids, "km:", "") -%}
   {%- if references|length > 0 %}
-  dsw:containsReference {{ references.split(',')|join(", ")}} ;
+  dsw:containsReference {{ references.split(',')|join(",")}} ;
   {%- for reference in question.referenceUuids -%}
    {%- do questionReferenceUuidParent.update({ reference : question.uuid }) -%}
    {%- do referenceOrder.update({ reference : loop.index}) -%}
@@ -242,7 +242,7 @@ km:{{metric.uuid}} a dsw:Metric ;
   
   {%- set tags = renderList(question.tagUuids, "km:", "") -%}
   {%- if tags|length > 0 %}
-  dsw:hasTag {{ tags.split(',')|join(", ")}} ;
+  dsw:hasTag {{ tags.split(',')|join(",")}} ;
   {%- endif -%}
 
   {%- if question.requiredPhaseUuid %}
@@ -273,11 +273,11 @@ km:{{question.uuid}} a dsw:ListOfItemsQuestion ;
   {%- set replies = renderReplyByLastUuid(question) -%}
 
   {%- if replies|length > 0 %} ;
-  dsw:hasReply {{ replies.split(',')|join(", ")}}
+  dsw:hasReply {{ replies.split(',')|join(",")}}
   {%- endif -%}
 
   {%- if followupQuestionsList|length > 0 %} ;
-  dsw:containsItemTemplFollowupQuestion {{ followupQuestionsList.split(',')|join(", ")}} .
+  dsw:containsItemTemplFollowupQuestion {{ followupQuestionsList.split(',')|join(",")}} .
   {%- for followupQuestionUuid in question.itemTemplateQuestionUuids -%}
   {%- set followupQuestion = ctx.knowledgeModel.entities.questions[followupQuestionUuid] -%}  
   {{renderQuestionType(followupQuestion, question.uuid, loop.index)}}
@@ -296,11 +296,11 @@ km:{{question.uuid}} a dsw:OptionsQuestion ;
   {%- set replies = renderReplyByLastUuid(question) -%}
 
   {%- if replies|length > 0 %} ;
-  dsw:hasReply {{ replies.split(',')|join(", ")}}
+  dsw:hasReply {{ replies.split(',')|join(",")}}
   {%- endif -%}
 
   {%- if answers|length > 0 %} ;
-  dsw:containsAnswer {{ answers.split(',')|join(", ")}} .
+  dsw:containsAnswer {{ answers.split(',')|join(",")}} .
   {%- for answerUuid in question.answerUuids  -%}
   {%- do optionsQuestionAnswerUuidParent.update({ answerUuid : question.uuid}) -%}
   {%- do answerOrder.update({ answerUuid : loop.index}) -%}
@@ -322,7 +322,7 @@ km:{{question.uuid}} a dsw:ValueQuestion ;
   {%- set replies = renderReplyByLastUuid(question) -%}
   
   {%- if replies|length > 0 %} 
-  dsw:hasReply {{ replies.split(',')|join(", ")}} ;
+  dsw:hasReply {{ replies.split(',')|join(",")}} ;
   {%- endif %}
   dsw:hasParent km:{{parentUuid}} .
 {%- endmacro -%}
@@ -349,7 +349,7 @@ km:{{question.uuid}} a dsw:IntegrationQuestion ;
   {%- set replies = renderReplyByLastUuid(question) -%}
   
   {%- if replies|length > 0 %} 
-  dsw:hasReply {{ replies.split(',')|join(", ")}} ;
+  dsw:hasReply {{ replies.split(',')|join(",")}} ;
   {%- endif %}
   dsw:hasParent km:{{parentUuid}} .
 {%- endmacro -%}
@@ -361,13 +361,13 @@ km:{{question.uuid}} a dsw:MultiChoiceQuestion ;
   
 {%- set choices = renderList(question.choiceUuids, "km:", "") -%}
   {%- if choices|length > 0 %}
-  dsw:containsChoice {{ choices.split(',')|join(", ")}} ;
+  dsw:containsChoice {{ choices.split(',')|join(",")}} ;
   {%- endif -%}
 
   {%- set replies = renderReplyByLastUuid(question) -%}
   
   {%- if replies|length > 0 %}
-  dsw:hasReply {{ replies.split(',')|join(", ")}} ;
+  dsw:hasReply {{ replies.split(',')|join(",")}} ;
   {%- endif %}
   dsw:hasParent km:{{parentUuid}} .
   {%- for choiceUuid in question.choiceUuids  -%}
@@ -386,7 +386,7 @@ km:{{question.uuid}} a dsw:ItemSelectQuestion ;
   {%- set replies = renderReplyByLastUuid(question) -%}
   
   {%- if replies|length > 0 %}
-  dsw:hasReply {{ replies.split(',')|join(", ")}} ;
+  dsw:hasReply {{ replies.split(',')|join(",")}} ;
   {%- endif %}
   dsw:hasParent km:{{parentUuid}} .
 {%- endmacro -%}
@@ -404,7 +404,7 @@ km:{{question.uuid}} a dsw:FileQuestion ;
   {%- set replies = renderReplyByLastUuid(question) -%}
   
   {%- if replies|length > 0 %}
-  dsw:hasReply {{ replies.split(',')|join(", ")}} ;
+  dsw:hasReply {{ replies.split(',')|join(",")}} ;
   {%- endif %}
   dsw:hasParent km:{{parentUuid}} .
 {%- endmacro -%}
@@ -463,7 +463,7 @@ km:{{answer.uuid}} a dsw:Answer ;
 
   {%- set followupQuestions = renderList(answer.followUpUuids, "km:", "") -%}
   {%- if followupQuestions|length > 0 %}
-  dsw:containsFollowupQuestion {{ followupQuestions.split(',')|join(", ")}} ;
+  dsw:containsFollowupQuestion {{ followupQuestions.split(',')|join(",")}} ;
   {%- endif -%}
   {%- if answer.annotations %}
   {{ renderAnnotation(answer.annotations) }} ;
@@ -487,22 +487,22 @@ km:{{ ctx.knowledgeModel.uuid }} a dsw:KnowledgeModel ;
   dsw:createdAt "{{dc.pkg.createdAt}}"^^xsd:dateTime ;
   {%- set chapters = renderList(ctx.knowledgeModel.chapterUuids, "km:", "") -%}
   {%- if chapters|length > 0 %}
-  dsw:containsChapter {{ chapters.split(',')|join(", ")}}
+  dsw:containsChapter {{ chapters.split(',')|join(",")}}
   {%- endif %}
 
   {%- set integrations = renderList(ctx.knowledgeModel.integrationUuids, "km:", "") -%}
   {%- if integrations|length > 0 %} ;
-  dsw:containsIntegration {{ integrations.split(',')|join(", ")}} 
+  dsw:containsIntegration {{ integrations.split(',')|join(",")}} 
   {%- endif %}
   
   {%- set metrics = renderList(ctx.knowledgeModel.metricUuids, "km:", "") -%}
   {%- if metrics|length > 0 %} ;
-  dsw:containsMetric {{ metrics.split(',')|join(", ")}}
+  dsw:containsMetric {{ metrics.split(',')|join(",")}}
   {%- endif %}
 
   {%- set phases = renderList(ctx.knowledgeModel.phaseUuids, "km:", "") -%}
   {%- if phases|length > 0 %} ;
-  dsw:containsPhase {{ phases.split(',')|join(", ")}}
+  dsw:containsPhase {{ phases.split(',')|join(",")}}
   {%- endif %}
 
   {%- if ctx.knowledgeModel.annotations %} ;
@@ -511,7 +511,7 @@ km:{{ ctx.knowledgeModel.uuid }} a dsw:KnowledgeModel ;
 
   {%- set tags = renderList(ctx.knowledgeModel.tagUuids, "km:", "") -%}
   {%- if tags|length > 0 %} ;
-  dsw:containsTag {{ tags.split(',')|join(", ")}}
+  dsw:containsTag {{ tags.split(',')|join(",")}}
   {%- endif -%} .
   
 {#- ------------------------------------------------------------------------------------ -#}
