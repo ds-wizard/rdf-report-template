@@ -4,12 +4,16 @@
 
 {%- set dc = ctx|to_context_obj -%}
 
-{%- macro makeList(list, strBefore, strAfter) -%}
-  {%- set resultList = [] -%}
-    {%- for item in list -%}
-    {%- do resultList.append(strBefore+item+strAfter) -%}
-    {%- endfor -%}
-    {{resultList|join(", ") }}
+{%- macro renderQuotedList(list) -%}
+  {%- for item in list -%}
+    "{{ item }}"{% if not loop.last %}, {% endif %}
+  {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro renderPrefixedList(list, prefix) -%}
+  {%- for item in list -%}
+    {{ prefix }}{{ item }}{% if not loop.last %}, {% endif %}
+  {%- endfor -%}
 {%- endmacro -%}
 
 {#- ------------------------------------------------------------------------------------ -#}
@@ -83,9 +87,8 @@ reply:{{replyPath}} a dsw:ValueReply ;
 reply:{{replyPath}} a dsw:ItemListReply ;
   dsw:path "{{replyPath}}" ;
 
-  {%- set replies = makeList(reply.value.value, '"', '"') -%}
-  {%- if replies|length > 0 %}
-  dsw:replyValue {{ replies.split(',')|join(", ")}} ;
+  {%- if reply.value.value|length > 0 %}
+  dsw:replyValue {{ renderQuotedList(reply.value.value) }} ;
   
   {%- endif %}
   {{ renderReply(replyPath, reply) }} .
@@ -125,7 +128,7 @@ reply:{{replyPath}} a dsw:ItemListReply ;
     {%- else -%}
       {%- set integrationReplyValue = reply.value.value.value.rsplit(" ![]")[0]|replace("**", "")|markdown|replace("<p>", "")|replace("</p>", "") -%}
       {%- set integrationReplyItem = "" -%}
-    {%- endif -%}
+    {%- endif %}
 
 reply:{{replyPath}} a dsw:IntegrationTypeIntegrationReply ;
   dsw:path "{{replyPath}}" ;
@@ -161,11 +164,9 @@ reply:{{replyPath}} a dsw:PlainTypeIntegrationReply ;
 
 reply:{{replyPath}} a dsw:MultiChoiceReply ;
   dsw:path "{{replyPath}}" ;
-  {%- set choicesUuidPrefix = makeList(reply.value.value, "km:", "") -%}
-  {%- set choicesUuid = makeList(reply.value.value, '"', '"') -%}
-  {%- if choicesUuidPrefix|length > 0 %}
-  dsw:multiChoiceReplyValue {{ choicesUuidPrefix.split(',')|join(", ")}} ;
-  dsw:replyValue {{choicesUuid.split(',')|join(", ")}} ;
+  {%- if reply.value.value|length > 0 %}
+  dsw:multiChoiceReplyValue {{ renderPrefixedList(reply.value.value, "km:")}} ;
+  dsw:replyValue {{renderQuotedList(reply.value.value)}} ;
 
   {%- endif %}
   {{ renderReply(replyPath, reply) }} .
@@ -215,31 +216,30 @@ reply:{{replyPath}} a dsw:FileReply ;
 {#-  QUESTIONNAIRE                                                                       -#}
 {#- ------------------------------------------------------------------------------------ -#}
 
-questionnaire:{{ctx.questionnaire.uuid}} a dsw:Questionnaire ;
-  dsw:uuid "{{ctx.questionnaire.uuid}}" ;
-  {%- if ctx.questionnaire.name %}
-  dsw:title {{ctx.questionnaire.name|tojson}} ;
+questionnaire:{{ctx.project.uuid}} a dsw:Questionnaire ;
+  dsw:uuid "{{ctx.project.uuid}}" ;
+  {%- if ctx.project.name %}
+  dsw:title {{ctx.project.name|tojson}} ;
   {%- endif -%}
-  {%- if ctx.questionnaire.description %}
-  dsw:description {{ctx.questionnaire.description|tojson}} ;
+  {%- if ctx.project.description %}
+  dsw:description {{ctx.project.description|tojson}} ;
   {%- endif -%}
-  {%- set projectTags = makeList(ctx.questionnaire.projectTags, '"','"') -%}
-  {%- if projectTags|length > 0 %}
-  dsw:hasProjectTag {{ projectTags.split(',')|join(", ")}} ;
+  {%- if ctx.project.projectTags|length > 0 %}
+  dsw:hasProjectTag {{ renderQuotedList(ctx.project.projectTags)}} ;
   {%- endif %}
   dsw:hasCurrentVersion questionnaireVersion:{{ctx.questionnaireVersion}} ;
 
-  {%- if ctx.questionnaireVersions|length > 0 -%}
+  {%- if ctx.project.versions|length > 0 -%}
   {%- set versions = [] -%}
-  {%- for version in ctx.questionnaire.versions -%}
+  {%- for version in ctx.project.versions -%}
   {%- do versions.append("questionnaireVersion:"+version.uuid) -%}
   {%- endfor %}
   dsw:hasVersion {{versions|join(", ")}} ;
   {%- endif %}
-  dsw:hasPhase km:{{ctx.questionnaire.phaseUuid}} ;
+  dsw:hasPhase km:{{ctx.project.phaseUuid}} ;
   dsw:hasDocument document:{{ctx.document.uuid}} ;
-  {%- if ctx.questionnaire.createdBy.uuid %}
-  dsw:isCreatedBy user:{{ctx.questionnaire.createdBy.uuid}} ;
+  {%- if ctx.project.createdBy.uuid %}
+  dsw:isCreatedBy user:{{ctx.project.createdBy.uuid}} ;
   {%- endif %}
   dsw:usesKnowledgeModel km:{{ ctx.knowledgeModel.uuid }} .
 
@@ -247,7 +247,7 @@ questionnaire:{{ctx.questionnaire.uuid}} a dsw:Questionnaire ;
 {#-  QUESTIONNAIRE VERSION                                                               -#}
 {#- ------------------------------------------------------------------------------------ #}
 
-{%- if ctx.questionnaire.versions|length > 0 %}
+{%- if ctx.project.versions|length > 0 %}
   {%- for version in ctx.questionnaireVersions %}
   
 {{ renderQuestionnaireVersion(version, loop.index) }}
@@ -260,9 +260,9 @@ questionnaire:{{ctx.questionnaire.uuid}} a dsw:Questionnaire ;
 
 {%- set simpleAuthors = {} -%}
 
-{%- for replyPath in ctx.questionnaire.replies -%}
+{%- for replyPath in ctx.project.replies -%}
   
-  {%- set reply = ctx.questionnaire.replies[replyPath] -%}
+  {%- set reply = ctx.project.replies[replyPath] -%}
   {%- if reply.value.type == "StringReply" -%}
 
   {{renderStringReply(replyPath, reply, loop.index)}}
@@ -320,14 +320,12 @@ user:{{user.uuid}} a dsw:user ;
   dsw:affiliation {{user.affiliation}} ;
   {%- endif -%}
 
-  {%- set permissions = makeList(userItem.perms, '"', '"') -%}
-  {%- if permissions|length > 0 %}
-  dsw:permission {{permissions.split(',')|join(", ")}} ;
+  {%- if userItem.perms|length > 0 %}
+  dsw:permission {{renderQuotedList(userItem.perms)}} ;
   {%- endif -%}
   
-  {%- set sources = makeList(user.sources, '"', '"') -%}
-  {%- if sources|length > 0 %}
-  dsw:source {{ sources.split(',')|join(", ")}} ;
+  {%- if user.sources|length > 0 %}
+  dsw:source {{ renderQuotedList(user.sources) }} ;
   {%- endif %}
   dsw:createdAt "{{user.createdAt}}"^^xsd:dateTime ;
   dsw:updatedAt "{{user.updatedAt}}"^^xsd:dateTime .

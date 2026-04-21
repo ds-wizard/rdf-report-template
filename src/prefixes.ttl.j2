@@ -1,7 +1,9 @@
+{%- set dc = ctx|to_context_obj -%}
+
 @prefix dsw: <https://ontology.ds-wizard.org/dsw-ontology#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema> .
 @prefix schema: <https://schema.org/> .
-@prefix km: <{{ ctx.config.clientUrl }}/knowledge-models/{{ ctx.package.id }}/> .
+@prefix km: <{{ ctx.config.clientUrl }}/knowledge-models/{{ dc.pkg.id }}/> .
 @prefix user: <{{ ctx.config.clientUrl }}/users/> .
 @prefix organization: <{{ ctx.config.clientUrl }}/organizations/> . 
 @prefix report: <{{ ctx.config.clientUrl }}/projects/{{ctx.questionnaireUuid}}/metrics/> .
