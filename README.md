@@ -32,7 +32,7 @@ This template is released under Apache Licence, version 2. Read the LICENSE file
 ### 0.8.0
 
 - Update integrations to metamodel version 18.0 (released in DSW 4.29.0)
-- Fix rendering replies to ItemList and Multichoice question
+- Fix rendering replies to ItemList and MultiChoice questions
 - Fix spaces between items of a list
 
 ### 0.7.0
