@@ -229,7 +229,7 @@ questionnaire:{{ctx.project.uuid}} a dsw:Questionnaire ;
   {%- endif %}
   dsw:hasCurrentVersion questionnaireVersion:{{ctx.questionnaireVersion}} ;
 
-  {%- if ctx.questionnaireVersions|length > 0 -%}
+  {%- if ctx.project.versions|length > 0 -%}
   {%- set versions = [] -%}
   {%- for version in ctx.project.versions -%}
   {%- do versions.append("questionnaireVersion:"+version.uuid) -%}
