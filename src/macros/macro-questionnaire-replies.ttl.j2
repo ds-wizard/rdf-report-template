@@ -62,7 +62,13 @@ reply:{{replyPath}} a dsw:ValueReply ;
   {%- if type == "UrlQuestionValueType" %}
   dsw:urlReplyValue <{{reply.value.value}}> ;
 
-  {%- elif type == "StringQuestionValueType" or type == "TextQuestionValueType" or type == "EmailQuestionValueType" or type == "ColorQuestionValueType" %}
+  {%- elif type == "TextQuestionValueType" -%}
+  {%- if reply.value.value -%}
+  {%- set dcReply = dc.project.replies.get(replyPath)%}
+  dsw:replyValue "{{dcReply.markdown_plain}}" ;
+  {%- endif -%}
+
+  {%- elif type == "StringQuestionValueType" or type == "EmailQuestionValueType" or type == "ColorQuestionValueType" %}
   {%- if reply.value.value %}
   dsw:replyValue {{reply.value.value|tojson}} ;
   {%- endif -%}
