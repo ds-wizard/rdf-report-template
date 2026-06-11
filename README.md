@@ -29,6 +29,10 @@ This template is released under Apache Licence, version 2. Read the LICENSE file
 
 ## Changelog
 
+### 0.8.1
+
+- Fixed text value type questions rendering with markdown
+
 ### 0.8.0
 
 - Update integrations to metamodel version 18.0 (released in DSW 4.29.0)
